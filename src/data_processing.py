@@ -62,7 +62,7 @@ class DataProcessor:
 
 
 if __name__ == "__main__":
-    data = pd.read_csv("./data/input.csv")
+    data = pd.read_csv("./data/raw/input.csv")
     data = input_data_schema.validate(data)
     data_processor = DataProcessor(data, "2000-1-1")
     processed_data = data_processor.process_flow()

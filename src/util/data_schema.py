@@ -1,7 +1,9 @@
 import pandera as pa
 from pandera import Check, Column, DataFrameSchema
 
-# Define the schema for the data
+# Define the dataframe schema using Pandera
+# Coerce is set to True to convert the data to the specified data type if they are not
+
 input_data_schema = DataFrameSchema(
     {
         "CompNo": Column(str, nullable=False, coerce=True),

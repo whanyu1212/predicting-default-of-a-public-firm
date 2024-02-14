@@ -18,6 +18,8 @@ isort = "^5.13.2"
 docformatter = "^1.7.5"
 ipykernel = "^6.29.2"
 pandera = "^0.18.0"
+scikit-learn = "^1.4.0"
+scipy = "^1.12.0"
 
 
 [build-system]

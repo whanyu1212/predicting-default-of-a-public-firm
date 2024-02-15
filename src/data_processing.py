@@ -10,8 +10,8 @@ class DataProcessor:
         self.data = data
         self.cutoff_date = cutoff_date
 
-    # def filter_data_by_date(self, data):
-    #     return data[data["Date"] < self.cutoff_date]
+    def filter_data_by_date(self, data):
+        return data[data["Date"] < self.cutoff_date]
 
     def one_hot_encode_categorical_columns(self, data):
         industry_encoder = OneHotEncoder()
@@ -32,7 +32,9 @@ class DataProcessor:
 
     def winsorize_numerical_columns(self, data):
         for col in data.select_dtypes("number").columns:
-            data[col] = winsorize(data[col], limits=[0.05, 0.05], inclusive=(True, True))
+            data[col] = winsorize(
+                data[col], limits=[0.05, 0.05], inclusive=(True, True)
+            )
         return data
 
     def min_max_scale_numerical_columns(self, data):
@@ -46,9 +48,6 @@ class DataProcessor:
         data["Y"] = label_encoder.fit_transform(data["Y"])
         return data
 
-    # def remove_unwanted_columns(self, data):
-    #     data.drop(["Company_name", "Date", "CompNo"], axis=1, inplace=True)
-    #     return data
 
     def process_flow(self):
         df = self.data.copy()
@@ -57,7 +56,6 @@ class DataProcessor:
         df = self.winsorize_numerical_columns(df)
         df = self.min_max_scale_numerical_columns(df)
         df = self.label_encode_response_variable(df)
-        # df = self.remove_unwanted_columns(df)
         return df
 
 

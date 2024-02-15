@@ -47,7 +47,7 @@ class ModelPipeline:
             y_train,
             X_val,
             y_val,
-            "/workspaces/predicting-default-of-a-public-firm/config/catalog.yaml",
+            "./config/catalog.yaml",
         )
 
         # Run the hyperparameter tuning

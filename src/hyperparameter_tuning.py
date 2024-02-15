@@ -94,7 +94,7 @@ class HyperparameterTuner:
             pr_auc (float): the PR AUC of each trial
         """
         # logs the model, params, and pr_auc of a trial
-        mlflow.lightgbm.log_model(model, f"lightgbm_model_trial_{trial.number}")
+        mlflow.lightgbm.log_model(model, "lightgbm_model")
         mlflow.log_params(params)
         mlflow.log_metric("PR_AUC", pr_auc)
         # storing a pickled version of the best model

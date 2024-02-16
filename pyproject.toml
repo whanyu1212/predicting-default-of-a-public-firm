@@ -25,6 +25,7 @@ optuna = "^3.5.0"
 loguru = "^0.7.2"
 yfinance = "^0.2.36"
 mplfinance = "^0.12.10b0"
+shap = "^0.44.1"
 
 
 [build-system]

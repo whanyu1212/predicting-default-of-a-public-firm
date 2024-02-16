@@ -9,12 +9,9 @@ import mlflow.pyfunc
 import optuna
 import pandas as pd
 from lightgbm import LGBMClassifier, LGBMModel
-from loguru import logger
 from mlflow.exceptions import MlflowException
 from optuna.trial import Trial
 from sklearn.metrics import average_precision_score
-
-from src.util.general_utility_functions import parse_cfg
 
 
 class HyperparameterTuner:
@@ -24,7 +21,6 @@ class HyperparameterTuner:
         y_train: pd.Series,
         X_val: pd.DataFrame,
         y_val: pd.Series,
-        cfg_path: str,
     ):
         """
         Initialize the HyperparameterTuner class with the given
@@ -51,9 +47,6 @@ class HyperparameterTuner:
         self.y_train = y_train
         self.X_val = X_val
         self.y_val = y_val
-
-        # create customized scorer/metric to be used in the objective function
-        self.cfg = parse_cfg(cfg_path)
 
     def create_or_get_experiment(self, name: str) -> str:
         """
@@ -101,6 +94,16 @@ class HyperparameterTuner:
         trial.set_user_attr(key="best_booster", value=pickle.dumps(model))
 
     def objective(self, trial: Trial) -> float:
+        """
+        Define the objective function for the optuna study. Start the
+        mlflow run and log the model, params, and pr_auc of a trial.
+
+        Args:
+            trial (Trial): a specific trial of the optuna study
+
+        Returns:
+            float: score of the PR AUC of the model during the trial
+        """
 
         experiment_id = self.create_or_get_experiment("lightgbm-optuna")
 
@@ -133,11 +136,31 @@ class HyperparameterTuner:
         self,
         model_name: str,
         model_version: str,
-        n_trials: int = 10,
+        n_trials: int = 20,
         max_retries: int = 3,
         delay: int = 5,
-    ):
+    ) -> dict:
+        """
+        Create and orchestrate an optuna study to optimize the
+        hyperparameters of the lightgbm model.
+
+        Args:
+            model_name (str): model name assigned to the model
+            model_version (str): model version assigned to the model
+            n_trials (int, optional): The number of trials. Defaults to 20.
+            max_retries (int, optional): Max number of retries if exception occurs.
+            Defaults to 3.
+            delay (int, optional): Time out before retrying. Defaults to 5.
+
+        Raises:
+            RuntimeError: If the study fails to optimize after maximum retries
+
+        Returns:
+            dict: the best parameters from the study
+        """
+
         study = optuna.create_study(study_name="test", direction="maximize")
+        best_params = None
 
         for _ in range(max_retries):
             try:
@@ -150,29 +173,8 @@ class HyperparameterTuner:
                 time.sleep(delay)
         else:
             raise RuntimeError("Failed to optimize the study after maximum retries")
+
         with open("./output/best_param.json", "w") as outfile:
             json.dump(best_params, outfile)
 
-        experiment_id = self.create_or_get_experiment("lightgbm-optuna")
-        runs_df = mlflow.search_runs(
-            experiment_ids=experiment_id,
-            order_by=["metrics.pr_auc DESC"],
-        )
-        best_run = runs_df.iloc[0]
-        best_run_id = best_run["run_id"]
-
-        try:
-            _ = mlflow.register_model(
-                "runs:/" + best_run_id + "/lightgbm_model", model_name
-            )
-        except MlflowException as e:
-            logger.error(f"Failed to register model: {e}")
-
-        model = mlflow.pyfunc.load_model(
-            model_uri=f"models:/{model_name}/{model_version}"
-        )
-        logger.info(
-            "Model loaded. the model information is as follows: {}".format(model)
-        )
-
-        return model
+        return best_params

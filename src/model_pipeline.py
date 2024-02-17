@@ -60,10 +60,6 @@ class ModelPipeline:
         # Run the hyperparameter tuning
         best_params = tuner.create_optuna_study("lightgbm_model", "1")
 
-        # Create a new LGBMClassifier with the best parameters and fit it
-        # model = LGBMClassifier(**best_params)
-        # model.fit(X_train, y_train)
-
         return best_params
 
     def create_model_with_best_params(self, best_params):

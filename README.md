@@ -1,5 +1,3 @@
-# End-to-end credit default prediction for public firms
-
 ## Summary
 This project is implemented with modification from the `Probability of Default` white paper published by the National University of Singapore. The intention is to build a binary classificaiton model to predict the credit default status given the relevant features identified
 

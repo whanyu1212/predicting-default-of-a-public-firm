@@ -21,9 +21,10 @@ This project is implemented with modification from the `Probability of Default` 
 
 
 ## Workflow Diagram:
-Remark: 
+**Remark**: 
 - Certain trivial functions are omitted to save space
 - Hyperparameter tuning through Optuna are done within the `train_model` function
+- For more details, please look at the docstring within each class and function
 
 ```mermaid
 flowchart LR

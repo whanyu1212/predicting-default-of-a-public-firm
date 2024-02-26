@@ -18,7 +18,7 @@ This project is implemented with modification from the `Probability of Default` 
 - `Idiosyncratic Volatility`: 1-year idiosyncratic volatility of each firm, computed as the standard deviation of its residuals using the market model
 
 
-## Workflow Diagram:
+## High Level Workflow Diagram:
 **Remark**: 
 - Certain trivial functions are omitted to save space
 - Hyperparameter tuning through Optuna are done within the `train_model` function
@@ -41,3 +41,22 @@ end
 Data_Processing -->Modelling_Pipeline
 ```
 
+## Processing and Modelling Logic:
+1. <span style="background-color: #FFFF00">Schema validation</span> on the input data using **Pandera**
+   - Checks if the input columns are of the <span style="background-color: #FFFF00">correct dtypes</span>
+   - <span style="background-color: #FFFF00">Coerce</span> if they are not, e.g., Date is stored as string instead of datetime/timestamp 
+
+2. Data Extraction from Yahoo Finance:
+   - `get_data` downloads the pricing data into a pandas dataframe
+   - `fill_missing_dates` creates a dataframe using the min and max of the input data as the range parameters. Merge with the pricing data fetched to fill dates which no transaction occurred.
+   - `calculate_returns` Do a forward for the closing prices of the dates filled and then calculate the daily return
+   - `extraction_flow` connects the preceding functions together in a flow
+
+3. Data Processing class function:
+   - `filter_data_by_date` filters out data prior to 2000s as <span style="background-color: #FFFF00">recency bias</span> is expected. It can also reduce the risk of data (distribution) drift.
+   - `one_hot_encode_categorical_columns` applys encoding to the categorical variable industry classification code using <span style="background-color: #FFFF00">pd.get_dummies</span>
+   - `winsorize_numerical_columns` loops through all the column names, if they are of numeric in nature, apply <span style="background-color: #FFFF00">winsorization</span>
+   - `min_max_scale_numerical_columns` applys min max scaling by initializing the MinMaxScaler from sklearn.preprocessing. It should not matter for variables that are already encoded.
+   - `fetch_auxiliary_data` fetches the <span style="background-color: #FFFF00">Oil (BZ=F)</span> closing price from yfinance API
+   - `add_auxiliary_data` merges the processed input dataframe with the Oil pricing data from Yahoo Finance
+   - `process_flow` <span style="background-color: #FFFF00">links all the preceding steps</span> together in a flow

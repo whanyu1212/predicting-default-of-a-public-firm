@@ -1,6 +1,39 @@
 ## Summary
 This project is implemented with modification from the `Probability of Default` white paper published by the National University of Singapore. The intention is to build a binary classificaiton model to predict the credit default status given the relevant features identified
 
+## Folder Structure:
+Remark: files saved in mlruns (mlflow experiments for finding the best model) are omitted in the following diagram
+
+|-- config|
+|   |-- catalog.yaml
+|-- data
+|   |-- processed
+|       |-- processed_input.csv
+|   |-- raw
+|       |-- input.csv
+|-- notebooks
+|   |-- scratchpad.ipynb
+|-- src
+|   |-- utils
+|       |-- data_schema.py
+|       |-- general_utility_functions.py
+|   |-- __init__.py
+|   |-- data_processing.py
+|   |-- extract_financial_data.py
+|   |-- hyperparameter_tuning.py
+|   |-- main.py
+|   |-- model_pipeline.py
+|-- tests
+|   |-- __init__.py
+|   |-- test_data_processing.py
+|   |-- test_extract_financial_data.py
+|   |-- test_model_pipeline.py
+|-- .gitignore
+|-- .pre-commit-config.yaml
+|-- poetry.lock
+|-- pyproject.toml
+|-- README.md
+
 ## Model Inputs:
 
 #### Macro-Financial Factors:

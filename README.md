@@ -3,7 +3,7 @@ This project is implemented with modification from the `Probability of Default` 
 
 ## Folder Structure:
 Remark: files saved in mlruns (mlflow experiments for finding the best model) are omitted in the following diagram
-
+```
 |-- config|
 |   |-- catalog.yaml
 |-- data
@@ -33,6 +33,7 @@ Remark: files saved in mlruns (mlflow experiments for finding the best model) ar
 |-- poetry.lock
 |-- pyproject.toml
 |-- README.md
+```
 
 ## Model Inputs:
 

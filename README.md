@@ -2,7 +2,7 @@
 This project is implemented with modification from the `Probability of Default` white paper published by the National University of Singapore. The intention is to build a binary classificaiton model to predict the credit default status given the relevant features identified
 
 ## Folder Structure:
-Remark: files saved in mlruns (mlflow experiments for finding the best model) are omitted in the following diagram
+Remark: files saved in **mlruns** folder (mlflow artifacts and loggings) are omitted in the following diagram
 ```
 |-- config|
 |   |-- catalog.yaml

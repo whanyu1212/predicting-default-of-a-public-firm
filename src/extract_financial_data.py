@@ -89,7 +89,14 @@ class FinancialDataExtractor:
         data_copy["Return"] = data_copy["Close"] / data_copy["Close"].shift(1) - 1
         return data_copy
 
-    def extraction_flow(self):
+    def extraction_flow(self) -> pd.DataFrame:
+        """
+        Combines the methods in the class to extract the financial data.
+
+        Returns:
+            pd.DataFrame: pricing data stored
+            in a pandas dataframe
+        """
         data = self.fill_missing_dates(self.data)
         data = self.calculate_returns(data)
         return data

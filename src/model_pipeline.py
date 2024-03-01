@@ -1,3 +1,4 @@
+import pickle
 from typing import Tuple
 
 import numpy as np
@@ -119,6 +120,8 @@ class ModelPipeline:
         """
         lgbm_cl = LGBMClassifier(**best_params)
         lgbm_cl.fit(self.X_train, self.y_train)
+        with open("./models/lgbm_model.pkl", "wb") as f:
+            pickle.dump(lgbm_cl, f)
         return lgbm_cl
 
     def eval_model_performance(self, model: LGBMClassifier, test: pd.DataFrame) -> dict:

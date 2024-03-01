@@ -1,29 +1,9 @@
-param_distributions:
-  - name: lambda_l1
-    type: float
-    low: 1e-8
-    high: 10.0
-  - name: lambda_l2
-    type: float
-    low: 1e-8
-    high: 10.0
-  - name: num_leaves
-    type: int
-    low: 2
-    high: 256
-  - name: feature_fraction
-    type: float
-    low: 0.4
-    high: 1.0
-  - name: bagging_fraction
-    type: float
-    low: 0.4
-    high: 1.0
-  - name: bagging_freq
-    type: int
-    low: 1
-    high: 7
-  - name: min_child_samples
-    type: int
-    low: 5
-    high: 100
+data:
+  file_path: "./data/raw/input.csv"
+dates:
+  cutoff_date: "2000-1-1"
+  test_splitting_date: "2020-1-1"
+  val_splitting_date: "2015-1-1"
+columns:
+  categorical_column: "INDUSTRY2"
+  target_column: "Y"

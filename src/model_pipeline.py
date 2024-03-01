@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import numpy as np
 import pandas as pd
 from lightgbm import LGBMClassifier
@@ -14,14 +16,39 @@ from src.hyperparameter_tuning import HyperparameterTuner
 
 class ModelPipeline:
     def __init__(
-        self, df, test_splitting_date, validation_splitting_date, target_column
+        self,
+        df: pd.DataFrame,
+        test_splitting_date: str,
+        validation_splitting_date: str,
+        target_column: str = "Y",
     ):
+        """
+        Initialize the ModelPipeline class with the given parameters.
+
+        Args:
+            df (pd.DataFrame): input data for model training
+            test_splitting_date (str): cut off date for splitting the
+            train/val and test data
+            validation_splitting_date (str): cut off date for splitting
+            the train and validation data
+            target_column (str, optional): Name of the response. Defaults to "Y".
+        """
         self.df = df
         self.test_splitting_date = test_splitting_date
         self.validation_splitting_date = validation_splitting_date
         self.target_column = target_column
 
-    def naive_timeseries_splitting(self):
+    def naive_timeseries_splitting(
+        self,
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        """
+        Split the data into train, val, test according to the cut off
+        dates respectively.
+
+        Returns:
+            Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+            output dataframes for train, val, test
+        """
         conditions = [
             (self.df["Date"] < self.validation_splitting_date),
             (self.df["Date"] >= self.validation_splitting_date)
@@ -38,11 +65,28 @@ class ModelPipeline:
         )
         return train, val, test
 
-    def remove_unwanted_features(self, *dfs):
+    def remove_unwanted_features(self, *dfs: Tuple[pd.DataFrame]) -> Tuple[pd.DataFrame]:
+        """
+        Remove unwanted columns from the input dataframes.
+
+        Returns:
+            Tuple[pd.DataFrame]: output dataframes with
+            unwanted columns removed
+        """
         unwanted_columns = ["Company_name", "Date", "CompNo", "indicator"]
         return [df.drop(columns=unwanted_columns) for df in dfs]
 
-    def train_model(self, train, val):
+    def train_model(self, train: pd.DataFrame, val: pd.DataFrame) -> dict:
+        """
+        Train and tune the model to get the best hyperparameters.
+
+        Args:
+            train (pd.DataFrame): training data to fix model
+            val (pd.DataFrame): validation data to tune model
+
+        Returns:
+            dict: combination of best hyperparameters
+        """
         self.X_train = train.drop(columns=[self.target_column])
         self.y_train = train[self.target_column]
 
@@ -62,12 +106,32 @@ class ModelPipeline:
 
         return best_params
 
-    def create_model_with_best_params(self, best_params):
+    def create_model_with_best_params(self, best_params: dict) -> LGBMClassifier:
+        """
+        Initialize a model with the best hyperparameters found through
+        optuna tuning.
+
+        Args:
+            best_params (dict): a dictionary of best hyperparameters (combination)
+
+        Returns:
+            LGBMClassifier: model
+        """
         lgbm_cl = LGBMClassifier(**best_params)
         lgbm_cl.fit(self.X_train, self.y_train)
         return lgbm_cl
 
-    def eval_model_performance(self, model, test):
+    def eval_model_performance(self, model: LGBMClassifier, test: pd.DataFrame) -> dict:
+        """
+        Evaluate the model performance using a series of metrics.
+
+        Args:
+            model (LGBMClassifier): model fitted in the previous step
+            test (pd.DataFrame): test set that the model has not seen before
+
+        Returns:
+            dict: a dictionary of metrics and scores
+        """
         X_test = test.drop(columns=[self.target_column])
         y_test = test[self.target_column]
         y_pred = model.predict(X_test)
@@ -83,13 +147,25 @@ class ModelPipeline:
 
         return metrics
 
-    def get_feature_importance(self, model):
+    def get_feature_importance(self, model: LGBMClassifier) -> pd.Series:
+        """
+        Get the feature importance ranking from the model based on the
+        validation set.
+
+        Args:
+            model (LGBMClassifier): model fitted
+
+        Returns:
+            pd.Series: series of feature importance scores
+        """
         feature_importance = pd.Series(
             model.feature_importances_, index=self.X_val.columns
         )
         return feature_importance.sort_values(ascending=False)
 
-    def run_pipeline(self):
+    def run_pipeline(self) -> None:
+        """Run the entire pipeline from data splitting to model
+        evaluation."""
         train, val, test = self.naive_timeseries_splitting()
         train, val, test = self.remove_unwanted_features(train, val, test)
         model = self.train_model(train, val)

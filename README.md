@@ -11,8 +11,16 @@ Remark: files saved in **mlruns** folder (mlflow artifacts and loggings) are omi
 |       |-- processed_input.csv
 |   |-- raw
 |       |-- input.csv
+|-- models
+|   |-- lgbm_model.pkl
 |-- notebooks
 |   |-- scratchpad.ipynb
+|-- output
+|   |-- best_param.json
+|-- screenshots
+|   |-- Screenshot 2024-03-01 at 1.27.31 PM.png
+|   |-- Screenshot 2024-03-01 at 1.28.00 PM.png
+|   |-- Screenshot 2024-03-01 at 11.38.45 PM.png
 |-- src
 |   |-- utils
 |       |-- data_schema.py
@@ -37,6 +45,8 @@ Remark: files saved in **mlruns** folder (mlflow artifacts and loggings) are omi
 
 ## Exploratory Analysis / Variable Profiling:
 <img src="./screenshots/Screenshot%202024-03-01%20at%201.27.31 PM.png" alt="Image1 alt text" width="400"/> <img src="./screenshots/Screenshot%202024-03-01%20at%201.28.00 PM.png" alt="Image2 alt text" width="400"/>
+
+The relevant code can be found in the scratchpad.ipynb or profiling_report.py (streamlit)
 
 ## Model Inputs:
 
@@ -98,6 +108,9 @@ Data_Processing -->Modelling_Pipeline
    - `add_auxiliary_data` merges the processed input dataframe with the Oil pricing data from Yahoo Finance
    - `process_flow` <span style="background-color: #FFFF00">links all the preceding steps</span> together in a flow
   
+
+## Tuning results:
+<img src="./screenshots/Screenshot 2024-03-01 at 11.38.45 PM.png" width="600"/> 
 
 ## Model Evaluation:
 Best combination of parameters: ```{"lambda_l1": 5.570639978441328, "lambda_l2": 0.2590733543918561, "num_leaves": 255, "feature_fraction": 0.6628533242236899, "bagging_fraction": 0.6017227728600203, "bagging_freq": 3, "min_child_samples": 56}```

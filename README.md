@@ -36,7 +36,7 @@ Remark: files saved in **mlruns** folder (mlflow artifacts and loggings) are omi
 ```
 
 ## Exploratory Analysis / Variable Profiling:
-![Image1 alt text](./screenshots/Screenshot%202024-03-01%20at%201.27.31%20PM.png) ![Image2 alt text](./screenshots/Screenshot%202024-03-01%20at%201.28.00%20PM.png)
+<img src="./screenshots/Screenshot%202024-03-01%20at%201.27.31 PM.png" alt="Image1 alt text" width="400"/> <img src="./screenshots/Screenshot%202024-03-01%20at%201.28.00 PM.png" alt="Image2 alt text" width="400"/>
 
 ## Model Inputs:
 

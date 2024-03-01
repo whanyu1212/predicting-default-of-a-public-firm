@@ -11,7 +11,7 @@ import pandas as pd
 from lightgbm import LGBMClassifier, LGBMModel
 from mlflow.exceptions import MlflowException
 from optuna.trial import Trial
-from sklearn.metrics import average_precision_score
+from sklearn.metrics import roc_auc_score
 
 
 class HyperparameterTuner:
@@ -24,7 +24,9 @@ class HyperparameterTuner:
     ):
         """
         Initialize the HyperparameterTuner class with the given
-        parameters.
+        parameters. The train and val sets are already splitted using
+        the time series splitting method. There is no point doing CV
+        since its not applicable in this context.
 
         Args:
             X_train (pd.DataFrame): Features of the training data
@@ -74,7 +76,7 @@ class HyperparameterTuner:
         return experiment_id
 
     def log_model_and_params(
-        self, model: LGBMModel, trial: Trial, params: Dict[str, Any], pr_auc: float
+        self, model: LGBMModel, trial: Trial, params: Dict[str, Any], roc_auc: float
     ):
         """
         Log the model, params, and mean accuracy from mlflow
@@ -89,7 +91,7 @@ class HyperparameterTuner:
         # logs the model, params, and pr_auc of a trial
         mlflow.lightgbm.log_model(model, "lightgbm_model")
         mlflow.log_params(params)
-        mlflow.log_metric("PR_AUC", pr_auc)
+        mlflow.log_metric("ROC_AUC", roc_auc)
         # storing a pickled version of the best model
         trial.set_user_attr(key="best_booster", value=pickle.dumps(model))
 
@@ -126,23 +128,24 @@ class HyperparameterTuner:
             y_proba = lgbm_cl.predict_proba(self.X_val)[:, 1]
 
             # Calculate PR-AUC on the validation set
-            pr_auc_score = average_precision_score(self.y_val, y_proba)
+            roc_score = roc_auc_score(self.y_val, y_proba)
+            # we can also log pr_auc_score if we want
+            # pr_auc_score = average_precision_score(self.y_val, y_proba)
 
-            self.log_model_and_params(lgbm_cl, trial, params, pr_auc_score)
+            self.log_model_and_params(lgbm_cl, trial, params, roc_score)
 
-        return pr_auc_score
+        return roc_score
 
     def create_optuna_study(
         self,
-        model_name: str,
-        model_version: str,
         n_trials: int = 20,
         max_retries: int = 3,
         delay: int = 5,
     ) -> dict:
         """
         Create and orchestrate an optuna study to optimize the
-        hyperparameters of the lightgbm model.
+        hyperparameters of the lightgbm model. Retry mechanism is added
+        to mitigate transient errors.
 
         Args:
             model_name (str): model name assigned to the model
@@ -159,7 +162,9 @@ class HyperparameterTuner:
             dict: the best parameters from the study
         """
 
-        study = optuna.create_study(study_name="test", direction="maximize")
+        study = optuna.create_study(
+            study_name="optimizing lightgbm", direction="maximize"
+        )
         best_params = None
 
         for _ in range(max_retries):
@@ -174,6 +179,7 @@ class HyperparameterTuner:
         else:
             raise RuntimeError("Failed to optimize the study after maximum retries")
 
+        # save the combination of best hyperparameters to a json file
         with open("./output/best_param.json", "w") as outfile:
             json.dump(best_params, outfile)
 

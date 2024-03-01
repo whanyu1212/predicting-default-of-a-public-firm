@@ -102,4 +102,8 @@ Data_Processing -->Modelling_Pipeline
 ## Model Evaluation:
 Best combination of parameters: ```{"lambda_l1": 5.570639978441328, "lambda_l2": 0.2590733543918561, "num_leaves": 255, "feature_fraction": 0.6628533242236899, "bagging_fraction": 0.6017227728600203, "bagging_freq": 3, "min_child_samples": 56}```
 
-Test set: ```{'accuracy': 0.9748966784019593, 'f1': 0.9658516530326045, 'pr_auc': 0.23979223005056124, 'roc_auc': 0.8875964770170739}```
+Test set: 
+
+If the tuning objective is to maximize roc_auc: ```{'accuracy': 0.9748966784019593, 'f1': 0.9658516530326045, 'pr_auc': 0.23979223005056124, 'roc_auc': 0.8875964770170739}```
+
+If the tuning objective is to maximize pr_auc: ```{'accuracy': 0.9762742997091688, 'f1': 0.9656752912853118, 'pr_auc': 0.29030592332240596, 'roc_auc': 0.8819679605650497}```

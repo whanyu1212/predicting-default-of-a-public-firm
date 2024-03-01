@@ -79,9 +79,9 @@ Data_Processing -->Modelling_Pipeline
 ```
 
 ## Processing and Modelling Logic:
-1. <span style="background-color: yellow">Schema validation</span> on the input data using **Pandera**
-   - Checks if the input columns are of the <span style="background-color: yellow">correct dtypes</span>
-   - <span style="background-color: yellow">Coerce</span> if they are not, e.g., Date is stored as string instead of datetime/timestamp 
+1. <span style="background-color: #FFFF00">Schema validation</span> on the input data using **Pandera**
+   - Checks if the input columns are of the <span style="background-color: #FFFF00">correct dtypes</span>
+   - <span style="background-color: #FFFF00">Coerce</span> if they are not, e.g., Date is stored as string instead of datetime/timestamp 
 
 2. Data Extraction from Yahoo Finance:
    - `get_data` downloads the pricing data into a pandas dataframe
@@ -90,19 +90,19 @@ Data_Processing -->Modelling_Pipeline
    - `extraction_flow` connects the preceding functions together in a flow
 
 3. Data Processing class function:
-   - `filter_data_by_date` filters out data prior to 2000s as <span style="background-color: yellow">recency bias</span> is expected. It can also reduce the risk of data (distribution) drift.
-   - `one_hot_encode_categorical_columns` applys encoding to the categorical variable industry classification code using <span style="background-color: yellow">pd.get_dummies</span>
-   - `winsorize_numerical_columns` loops through all the column names, if they are of numeric in nature, apply <span style="background-color: yellow">winsorization</span>
+   - `filter_data_by_date` filters out data prior to 2000s as <span style="background-color: #FFFF00">recency bias</span> is expected. It can also reduce the risk of data (distribution) drift.
+   - `one_hot_encode_categorical_columns` applys encoding to the categorical variable industry classification code using <span style="background-color: #FFFF00">pd.get_dummies</span>
+   - `winsorize_numerical_columns` loops through all the column names, if they are of numeric in nature, apply <span style="background-color: #FFFF00">winsorization</span>
    - `min_max_scale_numerical_columns` applys min max scaling by initializing the MinMaxScaler from sklearn.preprocessing. It should not matter for variables that are already encoded.
-   - `fetch_auxiliary_data` fetches the <span style="background-color: yellow">Oil (BZ=F)</span> closing price from yfinance API
+   - `fetch_auxiliary_data` fetches the <span style="background-color: #FFFF00">Oil (BZ=F)</span> closing price from yfinance API
    - `add_auxiliary_data` merges the processed input dataframe with the Oil pricing data from Yahoo Finance
-   - `process_flow` <span style="background-color: yellow">links all the preceding steps</span> together in a flow
+   - `process_flow` <span style="background-color: #FFFF00">links all the preceding steps</span> together in a flow
   
 
 ## Model Evaluation:
 Best combination of parameters: ```{"lambda_l1": 5.570639978441328, "lambda_l2": 0.2590733543918561, "num_leaves": 255, "feature_fraction": 0.6628533242236899, "bagging_fraction": 0.6017227728600203, "bagging_freq": 3, "min_child_samples": 56}```
 
 Test set: 
-If the tuning objective is to <span style="background-color: yellow">maximize roc_auc</span>: ```{'accuracy': 0.9748966784019593, 'f1': 0.9658516530326045, 'pr_auc': 0.23979223005056124, 'roc_auc': 0.8875964770170739}```
+If the tuning objective is to **maximize roc_auc**: ```{'accuracy': 0.9748966784019593, 'f1': 0.9658516530326045, 'pr_auc': 0.23979223005056124, 'roc_auc': 0.8875964770170739}```
 
-If the tuning objective is to <span style="background-color: yellow">maximize pr_auc</span>: ```{'accuracy': 0.9762742997091688, 'f1': 0.9656752912853118, 'pr_auc': 0.29030592332240596, 'roc_auc': 0.8819679605650497}```
+If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9762742997091688, 'f1': 0.9656752912853118, 'pr_auc': 0.29030592332240596, 'roc_auc': 0.8819679605650497}```

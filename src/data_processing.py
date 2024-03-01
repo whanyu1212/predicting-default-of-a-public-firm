@@ -144,6 +144,18 @@ class DataProcessor:
         data_merged = data.merge(aux_data, on="Date", how="left")
         return data_merged
 
+    def save_summary_statistics(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Get summary statistics for the input data.
+
+        Args:
+            data (pd.DataFrame): input data
+
+        Returns:
+            pd.DataFrame: summary statistics
+        """
+        data.describe().to_csv("./data/processed/summary_statistics.csv")
+
     def process_flow(self, column: str) -> pd.DataFrame:
         """
         Combine the entire data processing flow.
@@ -162,6 +174,7 @@ class DataProcessor:
         start, end = self.get_data_range_from_df(df)
         aux_data = self.fetch_auxiliary_data("BZ=F", start, end)
         df_combined = self.add_auxiliary_data(df, aux_data)
+        self.save_summary_statistics(df_combined)
         return df_combined
 
 

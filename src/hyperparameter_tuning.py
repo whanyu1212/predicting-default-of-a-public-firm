@@ -138,6 +138,8 @@ class HyperparameterTuner:
 
     def create_optuna_study(
         self,
+        model_name: str,
+        model_version: str,
         n_trials: int = 20,
         max_retries: int = 3,
         delay: int = 5,

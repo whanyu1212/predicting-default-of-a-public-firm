@@ -50,19 +50,24 @@ The relevant code can be found in the scratchpad.ipynb or profiling_report.py (s
 
 ## Model Inputs:
 
-#### Macro-Financial Factors:
-- `Stock Index Return`: Trailing 1-year return of the primary stock market, winsorized and currency adjusted
-- `Short-term Risk-Free Rate`: Yield on 3 month government bills
-- `Economy-level Distance-To-Default for financial firms` & `Economy-level Distance-To-Default for non-financial firms`: Median Distance-to-Default of financial/non-financial firms in each economy inclusive of those foreign firms whose primary stock exchange is in this economy (Not applicable to China) 
-
-#### Firm-Specific Attributes:
-- `Distance-to-Default (level)` & `Distance-to-Default (trend)`: Volatility-adjusted leverage based on Merton (1974) with special treatments
-- `Cash/Total Assets (level)` & `Cash/Total Assets (trend)`: For financial firm’s liquidity - Logarithm of the ratio of each firm’s sum of cash and short-term investments to total assets
-- `Current Assets/Current Liabilities (level)` & `Current Assets/Current Liabilities (level)`: For non-financial firm’s liquidity - Logarithm of the ratio of each firm’s current assets to current liabilities
-- `Net Income/Total Assets (level)` & `Net Income/Total Assets (trend)`: Profitability - Ratio of each firm’s net income to total assets 
-- `Relative Size (level)` & `Relative Size (trend)`: Logarithm of the ratio of each firm’s market capitalization to the economy’s median market capitalization over the past one year
-- `Relative Market-to-Book Ratio`: Individual firm’s market misvaluation/ future growth opportunities relative to the economy’s median level of market-to-book ratio
-- `Idiosyncratic Volatility`: 1-year idiosyncratic volatility of each firm, computed as the standard deviation of its residuals using the market model
+| Category | Attribute | Description |
+| --- | --- | --- |
+| Macro-Financial Factors | `Stock Index Return` | Trailing 1-year return of the primary stock market, winsorized and currency adjusted |
+| Macro-Financial Factors | `Short-term Risk-Free Rate` | Yield on 3 month government bills |
+| Macro-Financial Factors | `Economy-level Distance-To-Default for financial firms` | Median Distance-to-Default of financial firms in each economy inclusive of those foreign firms whose primary stock exchange is in this economy (Not applicable to China) |
+| Macro-Financial Factors | `Economy-level Distance-To-Default for non-financial firms` | Median Distance-to-Default of non-financial firms in each economy inclusive of those foreign firms whose primary stock exchange is in this economy (Not applicable to China) |
+| Firm-Specific Attributes | `Distance-to-Default (level)` | Volatility-adjusted leverage based on Merton (1974) with special treatments |
+| Firm-Specific Attributes | `Distance-to-Default (trend)` | Volatility-adjusted leverage based on Merton (1974) with special treatments |
+| Firm-Specific Attributes | `Cash/Total Assets (level)` | For financial firm’s liquidity - Logarithm of the ratio of each firm’s sum of cash and short-term investments to total assets |
+| Firm-Specific Attributes | `Cash/Total Assets (trend)` | For financial firm’s liquidity - Logarithm of the ratio of each firm’s sum of cash and short-term investments to total assets |
+| Firm-Specific Attributes | `Current Assets/Current Liabilities (level)` | For non-financial firm’s liquidity - Logarithm of the ratio of each firm’s current assets to current liabilities |
+| Firm-Specific Attributes | `Current Assets/Current Liabilities (trend)` | For non-financial firm’s liquidity - Logarithm of the ratio of each firm’s current assets to current liabilities |
+| Firm-Specific Attributes | `Net Income/Total Assets (level)` | Profitability - Ratio of each firm’s net income to total assets |
+| Firm-Specific Attributes | `Net Income/Total Assets (trend)` | Profitability - Ratio of each firm’s net income to total assets |
+| Firm-Specific Attributes | `Relative Size (level)` | Logarithm of the ratio of each firm’s market capitalization to the economy’s median market capitalization over the past one year |
+| Firm-Specific Attributes | `Relative Size (trend)` | Logarithm of the ratio of each firm’s market capitalization to the economy’s median market capitalization over the past one year |
+| Firm-Specific Attributes | `Relative Market-to-Book Ratio` | Individual firm’s market misvaluation/ future growth opportunities relative to the economy’s median level of market-to-book ratio |
+| Firm-Specific Attributes | `Idiosyncratic Volatility` | 1-year idiosyncratic volatility of each firm, computed as the standard deviation of its residuals using the market model |
 
 
 ## High Level Workflow Diagram:

@@ -114,17 +114,19 @@ Data_Processing -->Modelling_Pipeline
    - `add_auxiliary_data` merges the processed input dataframe with the Oil pricing data from Yahoo Finance
    - `process_flow` <span style="background-color: #FFFF00">links all the preceding steps</span> together in a flow
   
+4. Model Pipeline class function:
+  
 
 ## Tuning results on validation set:
 <img src="./screenshots/Screenshot 2024-03-01 at 11.38.45 PM.png" width="600"/> 
 
 ## Model Evaluation:
-Best combination of parameters: ```{"lambda_l1": 5.570639978441328, "lambda_l2": 0.2590733543918561, "num_leaves": 255, "feature_fraction": 0.6628533242236899, "bagging_fraction": 0.6017227728600203, "bagging_freq": 3, "min_child_samples": 56}```
+Best combination of parameters: ```{"lambda_l1": 2.936790772949318, "lambda_l2": 6.397468964536458, "num_leaves": 209, "feature_fraction": 0.680577513115211, "bagging_fraction": 0.407971418466264, "bagging_freq": 5, "min_child_samples": 38, "learning_rate": 0.03502279961404488, "max_depth": 10, "min_split_gain": 0.33635970049343217, "scale_pos_weight": 44.782368871281435, "n_estimators": 566}```
 
+Validation set:
+If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9196385190943543, 'f1': 0.9243469102689122, 'pr_auc': 0.35868479625382493, 'roc_auc': 0.8734528473928967}```
 Test set: 
-If the tuning objective is to **maximize roc_auc**: ```{'accuracy': 0.9748966784019593, 'f1': 0.9658516530326045, 'pr_auc': 0.23979223005056124, 'roc_auc': 0.8875964770170739}```
-
-If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9762742997091688, 'f1': 0.9656752912853118, 'pr_auc': 0.29030592332240596, 'roc_auc': 0.8819679605650497}```
+If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9871449305411569, 'f1': 0.9894485295679961, 'pr_auc': 0.04393246207745849, 'roc_auc': 0.8005253623188406}```
 
 ## Feature importance ranking:
 <img src="./output/feature_importance.png" width="600"/> 

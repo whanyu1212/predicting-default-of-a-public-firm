@@ -17,6 +17,7 @@ Remark: files saved in **mlruns** folder (mlflow artifacts and loggings) are omi
 |   |-- scratchpad.ipynb
 |-- output
 |   |-- best_param.json
+|   |-- feature_importance.png
 |-- screenshots
 |   |-- Screenshot 2024-03-01 at 1.27.31 PM.png
 |   |-- Screenshot 2024-03-01 at 1.28.00 PM.png
@@ -114,7 +115,7 @@ Data_Processing -->Modelling_Pipeline
    - `process_flow` <span style="background-color: #FFFF00">links all the preceding steps</span> together in a flow
   
 
-## Tuning results:
+## Tuning results on validation set:
 <img src="./screenshots/Screenshot 2024-03-01 at 11.38.45 PM.png" width="600"/> 
 
 ## Model Evaluation:
@@ -124,3 +125,6 @@ Test set:
 If the tuning objective is to **maximize roc_auc**: ```{'accuracy': 0.9748966784019593, 'f1': 0.9658516530326045, 'pr_auc': 0.23979223005056124, 'roc_auc': 0.8875964770170739}```
 
 If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9762742997091688, 'f1': 0.9656752912853118, 'pr_auc': 0.29030592332240596, 'roc_auc': 0.8819679605650497}```
+
+## Feature importance ranking:
+<img src="./output/feature_importance.png" width="600"/> 

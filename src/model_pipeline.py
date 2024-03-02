@@ -125,7 +125,9 @@ class ModelPipeline:
             pickle.dump(lgbm_cl, f)
         return lgbm_cl
 
-    def eval_model_performance(self, model: LGBMClassifier, test: pd.DataFrame) -> dict:
+    def eval_model_performance(
+        self, model: LGBMClassifier, val: pd.DataFrame, test: pd.DataFrame
+    ) -> dict:
         """
         Evaluate the model performance using a series of metrics.
 
@@ -136,20 +138,32 @@ class ModelPipeline:
         Returns:
             dict: a dictionary of metrics and scores
         """
+        X_val = val.drop(columns=[self.target_column])
+        y_val = val[self.target_column]
+        y_pred_val = model.predict(X_val)
+        y_pred_proba_val = model.predict_proba(X_val)[:, 1]
+
+        val_metrics = {
+            "accuracy": accuracy_score(y_val, y_pred_val),
+            "f1": f1_score(y_val, y_pred_val, average="weighted"),
+            "pr_auc": average_precision_score(y_val, y_pred_proba_val),
+            "roc_auc": roc_auc_score(y_val, y_pred_proba_val),
+        }
+
         X_test = test.drop(columns=[self.target_column])
         y_test = test[self.target_column]
         y_pred = model.predict(X_test)
         y_pred_proba = model.predict_proba(X_test)[:, 1]
         # A'PyFuncModel' loaded from optuna
         # does not have a 'predict_proba' method
-        metrics = {
+        test_metrics = {
             "accuracy": accuracy_score(y_test, y_pred),
             "f1": f1_score(y_test, y_pred, average="weighted"),
             "pr_auc": average_precision_score(y_test, y_pred_proba),
             "roc_auc": roc_auc_score(y_test, y_pred_proba),
         }
 
-        return metrics
+        return val_metrics, test_metrics
 
     def get_feature_importance(self, model: LGBMClassifier) -> pd.Series:
         """
@@ -185,8 +199,9 @@ class ModelPipeline:
         train, val, test = self.remove_unwanted_features(train, val, test)
         model = self.train_model(train, val)
         lgbm_cl = self.create_model_with_best_params(model)
-        metrics = self.eval_model_performance(lgbm_cl, test)
-        logger.info(f"Model performance: {metrics}")
+        val_metrics, test_metrics = self.eval_model_performance(lgbm_cl, val, test)
+        logger.info(f"Model performance on val set: {val_metrics}")
+        logger.info(f"Model performance on test set: {test_metrics}")
         feature_importance = self.get_feature_importance(lgbm_cl)
         logger.info(f"Feature importance with scores: {feature_importance}")
 

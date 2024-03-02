@@ -2,8 +2,8 @@ data:
   file_path: "./data/raw/input.csv"
 dates:
   cutoff_date: "2000-1-1"
-  test_splitting_date: "2020-1-1"
-  val_splitting_date: "2015-1-1"
+  test_splitting_date: "2021-1-1"
+  val_splitting_date: "2016-1-1"
 columns:
   categorical_column: "INDUSTRY2"
   target_column: "Y"

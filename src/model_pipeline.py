@@ -1,6 +1,7 @@
 import pickle
 from typing import Tuple
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from lightgbm import LGBMClassifier
@@ -164,6 +165,17 @@ class ModelPipeline:
         feature_importance = pd.Series(
             model.feature_importances_, index=self.X_val.columns
         )
+        feature_importance_sorted = feature_importance.sort_values()
+
+        # Create a bar plot
+        plt.figure(figsize=(10, 6))
+        feature_importance_sorted.plot(kind="barh", color="skyblue")
+        plt.title("Feature Importance")
+        plt.xlabel("Importance")
+        plt.ylabel("Features")
+
+        plt.savefig("./output/feature_importance.png", bbox_inches="tight")
+
         return feature_importance.sort_values(ascending=False)
 
     def run_pipeline(self) -> None:

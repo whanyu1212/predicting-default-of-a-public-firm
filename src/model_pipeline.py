@@ -7,8 +7,10 @@ import pandas as pd
 from lightgbm import LGBMClassifier
 from loguru import logger
 from sklearn.metrics import (
+    ConfusionMatrixDisplay,
     accuracy_score,
     average_precision_score,
+    confusion_matrix,
     f1_score,
     roc_auc_score,
 )
@@ -138,32 +140,63 @@ class ModelPipeline:
         Returns:
             dict: a dictionary of metrics and scores
         """
-        X_val = val.drop(columns=[self.target_column])
-        y_val = val[self.target_column]
-        y_pred_val = model.predict(X_val)
-        y_pred_proba_val = model.predict_proba(X_val)[:, 1]
+        val_metrics = self.evaluate_set(model, val)
+        test_metrics = self.evaluate_set(model, test)
 
-        val_metrics = {
-            "accuracy": accuracy_score(y_val, y_pred_val),
-            "f1": f1_score(y_val, y_pred_val, average="weighted"),
-            "pr_auc": average_precision_score(y_val, y_pred_proba_val),
-            "roc_auc": roc_auc_score(y_val, y_pred_proba_val),
+        return val_metrics, test_metrics
+
+    def evaluate_set(self, model: LGBMClassifier, data: pd.DataFrame) -> dict:
+        """
+        Evaluate the model performance on a given set using a series of
+        metrics.
+
+        Args:
+            model (LGBMClassifier): model fitted in the previous step
+            data (pd.DataFrame): data set to evaluate the model on
+
+        Returns:
+            dict: a dictionary of metrics and scores
+        """
+        X = data.drop(columns=[self.target_column])
+        y = data[self.target_column]
+        y_pred = model.predict(X)
+        y_pred_proba = model.predict_proba(X)[:, 1]
+
+        metrics = {
+            "accuracy": accuracy_score(y, y_pred),
+            "f1": f1_score(y, y_pred, average="weighted"),
+            "pr_auc": average_precision_score(y, y_pred_proba),
+            "roc_auc": roc_auc_score(y, y_pred_proba),
         }
 
+        return metrics
+
+    def generate_confusion_matrix(
+        self, model: LGBMClassifier, test: pd.DataFrame
+    ) -> np.ndarray:
+        """
+        Generate the confusion matrix for the test set.
+
+        Args:
+            model (LGBMClassifier): model fitted in the previous step
+            test (pd.DataFrame): test set that the model has not seen before
+
+        Returns:
+            np.ndarray: confusion matrix
+        """
         X_test = test.drop(columns=[self.target_column])
         y_test = test[self.target_column]
         y_pred = model.predict(X_test)
-        y_pred_proba = model.predict_proba(X_test)[:, 1]
-        # A'PyFuncModel' loaded from optuna
-        # does not have a 'predict_proba' method
-        test_metrics = {
-            "accuracy": accuracy_score(y_test, y_pred),
-            "f1": f1_score(y_test, y_pred, average="weighted"),
-            "pr_auc": average_precision_score(y_test, y_pred_proba),
-            "roc_auc": roc_auc_score(y_test, y_pred_proba),
-        }
 
-        return val_metrics, test_metrics
+        cm = confusion_matrix(y_test, y_pred, labels=model.classes_)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=model.classes_)
+        disp.plot(cmap="Blues")
+        plt.xlabel("Predicted", fontsize=14)
+        plt.ylabel("Truth", fontsize=14)
+        plt.title("Confusion Matrix", fontsize=16)
+        plt.savefig("./output/confusion_matrix.png", bbox_inches="tight")
+
+        return cm
 
     def get_feature_importance(self, model: LGBMClassifier) -> pd.Series:
         """
@@ -204,6 +237,8 @@ class ModelPipeline:
         logger.info(f"Model performance on test set: {test_metrics}")
         feature_importance = self.get_feature_importance(lgbm_cl)
         logger.info(f"Feature importance with scores: {feature_importance}")
+        cm = self.generate_confusion_matrix(lgbm_cl, test)
+        logger.info(f"Confusion matrix: {cm}")
 
 
 # if __name__ == "__main__":

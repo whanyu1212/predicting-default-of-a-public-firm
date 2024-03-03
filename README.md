@@ -72,6 +72,7 @@ The relevant code can be found in the scratchpad.ipynb or profiling_report.py (s
 
 
 Remark: 
+One possible data quality issue could be that the min of <u>total assets</u> before scaling goes to negative.Having a negative total asset value would **contradict the fundamental principle of what assets represent**
 
 ## High Level Workflow Diagram:
 **Remark**: 
@@ -126,11 +127,13 @@ Interpreting the acceptability of a PR AUC score should always be **contextual**
 
 Best combination of parameters: ```{"lambda_l1": 8.873255298337503, "lambda_l2": 4.727427102367874, "num_leaves": 9, "feature_fraction": 0.685297914889198, "bagging_fraction": 0.704314019446759, "bagging_freq": 4, "min_child_samples": 157, "learning_rate": 0.10382116330923424, "max_depth": 8, "min_split_gain": 0.042754101835854964, "scale_pos_weight": 46.660042583392475, "n_estimators": 148}```
 
+*Note that the trade off between pr_auc and accuracy below are intentional by using a very aggresive scale_pos_weight*
+
 Validation set:
-If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.8890292488582257, 'f1': 0.9072144426841616, 'pr_auc': 0.3601923592301291, 'roc_auc': 0.8772761327666468}```
+If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.7943834418423865, 'f1': 0.8462647285044139, 'pr_auc': 0.3553108109863231, 'roc_auc': 0.866433218160916}```
 
 Test set: 
-If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9696247149077337, 'f1': 0.9803995812332278, 'pr_auc': 0.04328777228982108, 'roc_auc': 0.8340579710144927}```
+If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9141613103877255, 'f1': 0.9507567631479845, 'pr_auc': 0.048769796117034664, 'roc_auc': 0.8173029891304348}```
 
 ## Feature importance ranking:
 <img src="./output/feature_importance.png" width="600"/> 

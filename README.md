@@ -144,7 +144,7 @@ Interpreting the acceptability of a PR AUC score should always be **contextual**
 
 Best combination of parameters: ```{"lambda_l1": 8.873255298337503, "lambda_l2": 4.727427102367874, "num_leaves": 9, "feature_fraction": 0.685297914889198, "bagging_fraction": 0.704314019446759, "bagging_freq": 4, "min_child_samples": 157, "learning_rate": 0.10382116330923424, "max_depth": 8, "min_split_gain": 0.042754101835854964, "scale_pos_weight": 46.660042583392475, "n_estimators": 148}```
 
-*Note that the trade off between pr_auc and accuracy below are intentional by using a very aggresive scale_pos_weight*
+<u>*Note that the trade off between pr_auc and accuracy below are intentional by using a very aggresive scale_pos_weight*</u>
 
 Validation set:
 If the tuning objective is to **maximize roc_auc**: ```{'accuracy': 0.9050626761247692, 'f1': 0.9168619433615146, 'pr_auc': 0.37202374319668213, 'roc_auc': 0.8796414359644725}```
@@ -160,7 +160,7 @@ If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.91416131038
 
 
 
-*Remark: Toying around with train, val, test split range can also lead to differences in performance*
+<u>*Remark: Toying around with train, val, test split range can also lead to differences in performance*</u>
 
 ## Feature importance ranking:
 <img src="./output/feature_importance.png" width="600"/> 

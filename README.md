@@ -71,6 +71,8 @@ The relevant code can be found in the scratchpad.ipynb or profiling_report.py (s
 | Firm-Specific Attributes | `Idiosyncratic Volatility` | 1-year idiosyncratic volatility of each firm, computed as the standard deviation of its residuals using the market model |
 
 
+Remark: 
+
 ## High Level Workflow Diagram:
 **Remark**: 
 - Certain trivial functions are omitted to save space
@@ -95,9 +97,9 @@ Data_Processing -->Modelling_Pipeline
 ```
 
 ## Processing and Modelling Logic:
-1. <span style="background-color: #FFFF00">Schema validation</span> on the input data using **Pandera**
-   - Checks if the input columns are of the <span style="background-color: #FFFF00">correct dtypes</span>
-   - <span style="background-color: #FFFF00">Coerce</span> if they are not, e.g., Date is stored as string instead of datetime/timestamp 
+1. Schema validation on the input data using **Pandera**
+   - Checks if the input columns are of the correct dtypes
+   - Coerce if they are not, e.g., Date is stored as string instead of datetime/timestamp 
 
 2. Data Extraction from Yahoo Finance:
    - `get_data` downloads the pricing data into a pandas dataframe
@@ -106,27 +108,32 @@ Data_Processing -->Modelling_Pipeline
    - `extraction_flow` connects the preceding functions together in a flow
 
 3. Data Processing class function:
-   - `filter_data_by_date` filters out data prior to 2000s as <span style="background-color: #FFFF00">recency bias</span> is expected. It can also reduce the risk of data (distribution) drift.
-   - `one_hot_encode_categorical_columns` applys encoding to the categorical variable industry classification code using <span style="background-color: #FFFF00">pd.get_dummies</span>
-   - `winsorize_numerical_columns` loops through all the column names, if they are of numeric in nature, apply <span style="background-color: #FFFF00">winsorization</span>
+   - `filter_data_by_date` filters out data prior to 2000s as recency bias is expected. It can also reduce the risk of data (distribution) drift.
+   - `one_hot_encode_categorical_columns` applys encoding to the categorical variable industry classification code using pd.get_dummies
+   - `winsorize_numerical_columns` loops through all the column names, if they are of numeric in nature, apply winsorization
    - `min_max_scale_numerical_columns` applys min max scaling by initializing the MinMaxScaler from sklearn.preprocessing. It should not matter for variables that are already encoded.
-   - `fetch_auxiliary_data` fetches the <span style="background-color: #FFFF00">Oil (BZ=F)</span> closing price from yfinance API
+   - `fetch_auxiliary_data` fetches the Oil (BZ=F) closing price from yfinance API
    - `add_auxiliary_data` merges the processed input dataframe with the Oil pricing data from Yahoo Finance
-   - `process_flow` <span style="background-color: #FFFF00">links all the preceding steps</span> together in a flow
+   - `process_flow` links all the preceding steps together in a flow
   
 4. Model Pipeline class function:
   
 
 ## Tuning results on validation set:
-<img src="./screenshots/Screenshot 2024-03-01 at 11.38.45 PM.png" width="600"/> 
 
-## Model Evaluation:
-Best combination of parameters: ```{"lambda_l1": 2.936790772949318, "lambda_l2": 6.397468964536458, "num_leaves": 209, "feature_fraction": 0.680577513115211, "bagging_fraction": 0.407971418466264, "bagging_freq": 5, "min_child_samples": 38, "learning_rate": 0.03502279961404488, "max_depth": 10, "min_split_gain": 0.33635970049343217, "scale_pos_weight": 44.782368871281435, "n_estimators": 566}```
+## Model Evaluation & Interpretation:
+Interpreting the acceptability of a PR AUC score should always be **contextual**, especially in scenarios involving **highly imbalanced dataset** where accurately predicting the minority class poses a significant challenge. Achieving even a modest improvement in PR AUC can be a difficult endeavor. Nevertheless, a low PR AUC score may still hold considerable value, particularly when evaluating the **relative costs of false positives versus false negatives**. In the realm of default prediction, <u>overlooking a potential default (a false negative) can be significantly more detrimental than mistakenly flagging a loan as a risk (a false positive)</u>. The financial repercussions of failing to identify a default are substantial. Therefore, a model with a modest PR AUC that nonetheless manages to enhance the detection of actual defaults (improving recall) compared to a basic model which overemphasize on accuracy can offer critical insights and lead to better outcome. Recognizing the limitations of both the model and the data, **integrating the expertise of subject matter experts** can further refine and validate the predictive insights, bridging gaps and enhancing decision-making processes.
+
+Best combination of parameters: ```{"lambda_l1": 8.873255298337503, "lambda_l2": 4.727427102367874, "num_leaves": 9, "feature_fraction": 0.685297914889198, "bagging_fraction": 0.704314019446759, "bagging_freq": 4, "min_child_samples": 157, "learning_rate": 0.10382116330923424, "max_depth": 8, "min_split_gain": 0.042754101835854964, "scale_pos_weight": 46.660042583392475, "n_estimators": 148}```
 
 Validation set:
-If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9196385190943543, 'f1': 0.9243469102689122, 'pr_auc': 0.35868479625382493, 'roc_auc': 0.8734528473928967}```
+If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.8890292488582257, 'f1': 0.9072144426841616, 'pr_auc': 0.3601923592301291, 'roc_auc': 0.8772761327666468}```
+
 Test set: 
-If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9871449305411569, 'f1': 0.9894485295679961, 'pr_auc': 0.04393246207745849, 'roc_auc': 0.8005253623188406}```
+If the tuning objective is to **maximize pr_auc**: ```{'accuracy': 0.9696247149077337, 'f1': 0.9803995812332278, 'pr_auc': 0.04328777228982108, 'roc_auc': 0.8340579710144927}```
 
 ## Feature importance ranking:
 <img src="./output/feature_importance.png" width="600"/> 
+
+Remark: The **oil prices and return** are not so critical in the modelling based on the feature importance ranking shown.
+

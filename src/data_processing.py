@@ -170,11 +170,12 @@ class DataProcessor:
         df = self.filter_data_by_date(df)
         df = self.one_hot_encode_categorical_columns(df, column)
         df = self.winsorize_numerical_columns(df)
+        self.save_summary_statistics(df)
         df = self.min_max_scale_numerical_columns(df)
         start, end = self.get_data_range_from_df(df)
         aux_data = self.fetch_auxiliary_data("BZ=F", start, end)
         df_combined = self.add_auxiliary_data(df, aux_data)
-        self.save_summary_statistics(df_combined)
+
         return df_combined
 
 

@@ -67,11 +67,6 @@ def main() -> None:
     modelling_flow(
         processed_data, test_splitting_date, val_splitting_date, target_column
     )
-    # You should get roughly the following eval results:
-    # Model performance: {'accuracy': 0.9748966784019593,
-    # 'f1': 0.9658516530326045,
-    # 'pr_auc': 0.23979223005056124,
-    # 'roc_auc': 0.8875964770170739}
 
 
 if __name__ == "__main__":

@@ -6,12 +6,14 @@ from typing import Any, Dict
 import mlflow
 import mlflow.lightgbm
 import mlflow.pyfunc
+import numpy as np
 import optuna
 import pandas as pd
 from lightgbm import LGBMClassifier, LGBMModel
 from mlflow.exceptions import MlflowException
+from optuna.samplers import TPESampler
 from optuna.trial import Trial
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import average_precision_score
 
 
 class HyperparameterTuner:
@@ -76,7 +78,7 @@ class HyperparameterTuner:
         return experiment_id
 
     def log_model_and_params(
-        self, model: LGBMModel, trial: Trial, params: Dict[str, Any], roc_auc: float
+        self, model: LGBMModel, trial: Trial, params: Dict[str, Any], pr_auc: float
     ):
         """
         Log the model, params, and mean accuracy from mlflow
@@ -91,7 +93,7 @@ class HyperparameterTuner:
         # logs the model, params, and pr_auc of a trial
         mlflow.lightgbm.log_model(model, "lightgbm_model")
         mlflow.log_params(params)
-        mlflow.log_metric("ROC_AUC", roc_auc)
+        mlflow.log_metric("PR_AUC", pr_auc)
         # storing a pickled version of the best model
         trial.set_user_attr(key="best_booster", value=pickle.dumps(model))
 
@@ -108,18 +110,27 @@ class HyperparameterTuner:
         """
 
         experiment_id = self.create_or_get_experiment("lightgbm-optuna")
-
+        ratio = float(np.sum(self.y_train == 0)) / np.sum(self.y_train == 1)
         with mlflow.start_run(experiment_id=experiment_id, nested=True):
             params = {
                 "objective": "binary",
                 "boosting_type": "gbdt",
-                "lambda_l1": trial.suggest_float("lambda_l1", 1e-8, 10.0),
-                "lambda_l2": trial.suggest_float("lambda_l2", 1e-8, 10.0),
-                "num_leaves": trial.suggest_int("num_leaves", 2, 256),
-                "feature_fraction": trial.suggest_float("feature_fraction", 0.4, 1.0),
-                "bagging_fraction": trial.suggest_float("bagging_fraction", 0.4, 1.0),
+                "lambda_l1": trial.suggest_float("lambda_l1", 0.01, 10.0),
+                "lambda_l2": trial.suggest_float("lambda_l2", 0.01, 10.0),
+                "num_leaves": trial.suggest_int("num_leaves", 2, 64),
+                "feature_fraction": trial.suggest_float("feature_fraction", 0.4, 0.8),
+                "bagging_fraction": trial.suggest_float("bagging_fraction", 0.4, 0.8),
                 "bagging_freq": trial.suggest_int("bagging_freq", 1, 7),
-                "min_child_samples": trial.suggest_int("min_child_samples", 5, 100),
+                "min_child_samples": trial.suggest_int("min_child_samples", 10, 200),
+                "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.2),
+                "max_depth": trial.suggest_int("max_depth", -1, 16),
+                "min_split_gain": trial.suggest_float("min_split_gain", 0.0, 0.1),
+                # "scale_pos_weight": trial.suggest_float(
+                # "scale_pos_weight", 1.0, 100.0),
+                "scale_pos_weight": trial.suggest_categorical(
+                    "scale_pos_weight", [ratio]
+                ),
+                "n_estimators": trial.suggest_int("n_estimators", 100, 2000),
             }
 
             lgbm_cl = LGBMClassifier(**params)
@@ -128,19 +139,19 @@ class HyperparameterTuner:
             y_proba = lgbm_cl.predict_proba(self.X_val)[:, 1]
 
             # Calculate PR-AUC on the validation set
-            roc_score = roc_auc_score(self.y_val, y_proba)
+            # roc_score = roc_auc_score(self.y_val, y_proba)
             # we can also log pr_auc_score if we want
-            # pr_auc_score = average_precision_score(self.y_val, y_proba)
+            pr_auc_score = average_precision_score(self.y_val, y_proba)
 
-            self.log_model_and_params(lgbm_cl, trial, params, roc_score)
+            self.log_model_and_params(lgbm_cl, trial, params, pr_auc_score)
 
-        return roc_score
+        return pr_auc_score
 
     def create_optuna_study(
         self,
         model_name: str,
         model_version: str,
-        n_trials: int = 20,
+        n_trials: int = 30,
         max_retries: int = 3,
         delay: int = 5,
     ) -> dict:
@@ -165,7 +176,9 @@ class HyperparameterTuner:
         """
 
         study = optuna.create_study(
-            study_name="optimizing lightgbm", direction="maximize"
+            study_name="optimizing lightgbm",
+            direction="maximize",
+            sampler=TPESampler(seed=42),
         )
         best_params = None
 

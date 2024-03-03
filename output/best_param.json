@@ -1,1 +1,1 @@
-{"lambda_l1": 7.934377396063395, "lambda_l2": 7.554667543090309, "num_leaves": 56, "feature_fraction": 0.8738717896120252, "bagging_fraction": 0.5457813039239009, "bagging_freq": 6, "min_child_samples": 92}
+{"lambda_l1": 2.7559937440564384, "lambda_l2": 3.9706355807972713, "num_leaves": 56, "feature_fraction": 0.7526402203180296, "bagging_fraction": 0.4897912266664819, "bagging_freq": 6, "min_child_samples": 171, "learning_rate": 0.03345115583636607, "max_depth": 13, "min_split_gain": 0.030068885477397, "scale_pos_weight": 46.660042583392475, "n_estimators": 385}
